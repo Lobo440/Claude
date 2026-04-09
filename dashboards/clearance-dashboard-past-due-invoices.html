@@ -69,7 +69,7 @@
   <div class="callout">
     <div>
       <div class="lbl">The Headline</div>
-      <div class="msg">$19.0M cleared between 12 Mar and 2 Apr (15 business days) &mdash; 63% of the $30M backlog gone. At $1.7M/day the remaining $11.0M clears in ~7 business days (≈1.3 weeks).</div>
+      <div class="msg">$19.0M cleared 12 Mar – 2 Apr (15 biz days, 63% of the $30M backlog). Week of 3–9 Apr held flat at $11.0M remaining &mdash; no material burn. Resuming the $1.7M/day standard Mon 13 Apr &rarr; clears by ~21 Apr.</div>
     </div>
   </div>
 
@@ -80,9 +80,9 @@
       <div class="sub">12 Mar – 2 Apr · 15 biz days</div>
     </div>
     <div class="tile accent">
-      <div class="k">Current Run Rate</div>
+      <div class="k">Target Run Rate</div>
       <div class="v">$1.7M<span style="font-size:18px;color:var(--muted);font-weight:500">/day</span></div>
-      <div class="sub">$8.5M / week pace</div>
+      <div class="sub">proven standard · resumes 13 Apr</div>
     </div>
     <div class="tile">
       <div class="k">% Backlog Cleared</div>
@@ -90,9 +90,9 @@
       <div class="sub">of $30M total backlog</div>
     </div>
     <div class="tile accent">
-      <div class="k">ETA to Zero</div>
-      <div class="v">~7<span style="font-size:18px;color:var(--muted);font-weight:500"> biz days</span></div>
-      <div class="sub">≈ 1.3 weeks at current rate</div>
+      <div class="k">Projected Clear Date</div>
+      <div class="v">~21 Apr</div>
+      <div class="sub">7 biz days from 13 Apr restart</div>
     </div>
   </div>
 
@@ -129,7 +129,7 @@
 
     <div class="card">
       <h2>Projected Burn-Down</h2>
-      <div class="hint">Remaining $11.0M today at $1.7M/day run rate &rarr; zero by biz day ~7.</div>
+      <div class="hint">Flat this week at $11.0M. Resumes $1.7M/day Mon 13 Apr &rarr; zero by ~21 Apr.</div>
       <svg viewBox="0 0 520 240" width="100%" height="240" role="img" aria-label="Burn-down projection">
         <!-- axes -->
         <line x1="50" y1="20" x2="50" y2="200" stroke="#CBD5E1"/>
@@ -148,24 +148,31 @@
           <line x1="50" y1="110" x2="500" y2="110"/>
           <line x1="50" y1="155" x2="500" y2="155"/>
         </g>
-        <!-- x labels (biz days) -->
+        <!-- x labels (dates) -->
         <g font-size="10" fill="#64748B" text-anchor="middle">
-          <text x="50" y="218">Today</text>
-          <text x="162" y="218">Day 2</text>
-          <text x="275" y="218">Day 4</text>
-          <text x="387" y="218">Day 6</text>
-          <text x="500" y="218">Day 7+</text>
+          <text x="50" y="218">9 Apr</text>
+          <text x="162" y="218">13 Apr</text>
+          <text x="275" y="218">15 Apr</text>
+          <text x="387" y="218">18 Apr</text>
+          <text x="500" y="218">21 Apr</text>
         </g>
-        <!-- shaded area under line: start at $11M -> y = 200 - (11/12)*180 = 200 - 165 = 35 -->
-        <path d="M 50 35 L 500 200 L 50 200 Z" fill="#D6ECDD" opacity="0.7"/>
-        <!-- burn line -->
-        <line x1="50" y1="35" x2="500" y2="200" stroke="#2E8B57" stroke-width="3"/>
-        <!-- start/end dots -->
-        <circle cx="50" cy="35" r="5" fill="#2E8B57"/>
+        <!-- plateau segment: flat from 9 Apr (x=50) to 13 Apr (x=162) at $11M (y=35) -->
+        <path d="M 50 35 L 162 35 L 162 200 L 50 200 Z" fill="#F1F5F9" opacity="0.9"/>
+        <line x1="50" y1="35" x2="162" y2="35" stroke="#94A3B8" stroke-width="3" stroke-dasharray="5,4"/>
+        <text x="106" y="26" font-size="10" fill="#64748B" text-anchor="middle" font-style="italic">plateau — no burn</text>
+        <!-- vertical divider at restart -->
+        <line x1="162" y1="20" x2="162" y2="200" stroke="#CBD5E1" stroke-dasharray="2,3"/>
+        <text x="162" y="14" font-size="10" font-weight="700" fill="#2E8B57" text-anchor="middle">RESTART</text>
+        <!-- burn segment: from 13 Apr ($11M, y=35) to 21 Apr ($0, y=200), x from 162 to 500 -->
+        <path d="M 162 35 L 500 200 L 162 200 Z" fill="#D6ECDD" opacity="0.7"/>
+        <line x1="162" y1="35" x2="500" y2="200" stroke="#2E8B57" stroke-width="3"/>
+        <!-- dots -->
+        <circle cx="50" cy="35" r="5" fill="#94A3B8"/>
+        <circle cx="162" cy="35" r="5" fill="#2E8B57"/>
         <circle cx="500" cy="200" r="5" fill="#2E8B57"/>
-        <!-- start label -->
-        <text x="60" y="30" font-size="11" font-weight="700" fill="#0B2545">$11.0M today</text>
-        <text x="495" y="192" font-size="11" font-weight="700" fill="#0B2545" text-anchor="end">$0 &middot; ~Day 7</text>
+        <!-- labels -->
+        <text x="56" y="52" font-size="11" font-weight="700" fill="#0B2545">$11.0M today</text>
+        <text x="495" y="192" font-size="11" font-weight="700" fill="#0B2545" text-anchor="end">$0 &middot; ~21 Apr</text>
       </svg>
     </div>
   </div>
@@ -173,8 +180,8 @@
   <!-- Row 2: Run-rate comparison + metrics table -->
   <div class="row">
     <div class="card">
-      <h2>Run Rate — Momentum</h2>
-      <div class="hint">Current daily pace vs. program average. Positive = accelerating.</div>
+      <h2>Run Rate — Proven Standard</h2>
+      <div class="hint">Burn-window avg vs. proven $1.7M/day standard we're resuming next week.</div>
       <svg viewBox="0 0 520 240" width="100%" height="240" role="img" aria-label="Run rate comparison">
         <!-- baseline -->
         <line x1="60" y1="200" x2="500" y2="200" stroke="#CBD5E1"/>
@@ -194,13 +201,13 @@
         <!-- Avg bar: $1.267M → height = (1.267/2)*180 ≈ 114 -->
         <rect x="130" y="86" width="110" height="114" fill="#13315C"/>
         <text x="185" y="80" font-size="14" font-weight="700" fill="#0B2545" text-anchor="middle">$1.27M</text>
-        <text x="185" y="220" font-size="12" fill="#64748B" text-anchor="middle">Program Avg</text>
+        <text x="185" y="220" font-size="12" fill="#64748B" text-anchor="middle">Burn-Window Avg</text>
         <text x="185" y="234" font-size="10" fill="#94A3B8" text-anchor="middle">($19M / 15 days)</text>
-        <!-- Current bar: $1.7M → height = (1.7/2)*180 = 153 -->
+        <!-- Target bar: $1.7M → height = (1.7/2)*180 = 153 -->
         <rect x="310" y="47" width="110" height="153" fill="#2E8B57"/>
         <text x="365" y="41" font-size="14" font-weight="700" fill="#2E8B57" text-anchor="middle">$1.70M</text>
-        <text x="365" y="220" font-size="12" fill="#64748B" text-anchor="middle">Current Rate</text>
-        <text x="365" y="234" font-size="10" fill="#94A3B8" text-anchor="middle">(latest daily pace)</text>
+        <text x="365" y="220" font-size="12" fill="#64748B" text-anchor="middle">Proven Standard</text>
+        <text x="365" y="234" font-size="10" fill="#94A3B8" text-anchor="middle">(target · resumes 13 Apr)</text>
         <!-- Delta arrow -->
         <line x1="245" y1="100" x2="305" y2="60" stroke="#2E8B57" stroke-width="2" marker-end="url(#arrow)"/>
         <defs>
@@ -220,23 +227,24 @@
         <tbody>
           <tr><td>Total Cleared</td><td class="val">$19.0M</td></tr>
           <tr><td>Burn Window</td><td class="val">12 Mar – 2 Apr · 15 biz days</td></tr>
-          <tr><td>Program Avg Daily</td><td class="val">$1.27M / day</td></tr>
-          <tr><td>Current Run Rate</td><td class="val">$1.70M / day</td></tr>
-          <tr><td>Weekly Run Rate</td><td class="val">$8.5M / week</td></tr>
+          <tr><td>Burn-Window Avg Daily</td><td class="val">$1.27M / day</td></tr>
+          <tr><td>Proven / Target Rate</td><td class="val">$1.70M / day</td></tr>
+          <tr><td>Weekly Target Rate</td><td class="val">$8.5M / week</td></tr>
           <tr><td>Acceleration vs. Avg</td><td class="val" style="color:#2E8B57">+34%</td></tr>
+          <tr><td>Week of 3–9 Apr</td><td class="val" style="color:#B45309">plateau · $0 burned</td></tr>
           <tr><td>Total Backlog</td><td class="val">$30.0M</td></tr>
           <tr><td>% Backlog Cleared</td><td class="val">63%</td></tr>
-          <tr><td>Remaining Backlog (9 Apr)</td><td class="val">$11.0M</td></tr>
-          <tr><td>ETA to Zero</td><td class="val">~7 biz days (~1.3 wks)</td></tr>
-          <tr><td>Projected Clear Date</td><td class="val">~20 Apr 2026</td></tr>
-          <tr><td>Projected Total Cycle</td><td class="val">~27 biz days (~5.5 wks)</td></tr>
+          <tr><td>Remaining (9 Apr)</td><td class="val">$11.0M</td></tr>
+          <tr><td>Restart Date</td><td class="val">Mon 13 Apr 2026</td></tr>
+          <tr><td>ETA to Zero (post-restart)</td><td class="val">~7 biz days</td></tr>
+          <tr><td>Projected Clear Date</td><td class="val">~21 Apr 2026</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <footer>
-    Total backlog = $19M cleared + $11M remaining = $30M. Burn window 12 Mar – 2 Apr = 15 business days. Business days = 5/week. ETA assumes current $1.7M/day run rate holds; actual may vary with dispute load and cash application capacity.
+    Total backlog = $19M cleared + $11M remaining = $30M. Burn window 12 Mar – 2 Apr = 15 business days. Week of 3–9 Apr held flat (no material burn); reassessing and resuming the $1.7M/day proven standard Mon 13 Apr. ETA assumes rate holds; actual may vary with dispute load and cash application capacity.
   </footer>
 </div>
 </body>
