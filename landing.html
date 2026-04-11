@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flappy Bird — Tap. Flap. Survive.</title>
+<style>
+  :root {
+    --sky: #4EC0CA;
+    --sky-dark: #3BA5AF;
+    --ground: #DED895;
+    --ground-dark: #C8C17A;
+    --pipe: #73BF2E;
+    --pipe-dark: #5A9A1F;
+    --ink: #1a2b2d;
+    --ink-soft: #3d5558;
+    --white: #ffffff;
+    --gold: #FFD700;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--ink);
+    background: var(--white);
+    line-height: 1.6;
+  }
+
+  /* ---------- NAV ---------- */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    background: rgba(78, 192, 202, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  nav .logo {
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--white);
+    text-shadow: 2px 2px 0 var(--ink);
+    letter-spacing: -0.5px;
+  }
+  nav .logo-bird { margin-right: 6px; }
+  nav ul {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  nav a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 600;
+    text-shadow: 1px 1px 0 var(--ink-soft);
+    transition: transform 0.2s;
+  }
+  nav a:hover { transform: translateY(-2px); }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--sky) 0%, var(--sky) 80%, var(--ground) 80%, var(--ground) 100%);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 24px 180px;
+  }
+
+  /* Clouds */
+  .cloud {
+    position: absolute;
+    background: var(--white);
+    border-radius: 100px;
+    opacity: 0.9;
+    animation: drift 20s linear infinite;
+  }
+  .cloud::before, .cloud::after {
+    content: '';
+    position: absolute;
+    background: var(--white);
+    border-radius: 50%;
+  }
+  .cloud-1 { width: 100px; height: 30px; top: 18%; left: 10%; }
+  .cloud-1::before { width: 50px; height: 50px; top: -25px; left: 15px; }
+  .cloud-1::after  { width: 35px; height: 35px; top: -18px; left: 55px; }
+  .cloud-2 { width: 140px; height: 36px; top: 28%; right: 12%; animation-delay: -8s; }
+  .cloud-2::before { width: 60px; height: 60px; top: -30px; left: 20px; }
+  .cloud-2::after  { width: 45px; height: 45px; top: -22px; left: 70px; }
+  .cloud-3 { width: 80px; height: 24px; top: 45%; left: 55%; animation-delay: -14s; }
+  .cloud-3::before { width: 40px; height: 40px; top: -20px; left: 10px; }
+  .cloud-3::after  { width: 30px; height: 30px; top: -15px; left: 40px; }
+
+  @keyframes drift {
+    from { transform: translateX(-50px); }
+    to   { transform: translateX(50px); }
+  }
+
+  /* Decorative pipes flanking hero */
+  .pipe {
+    position: absolute;
+    width: 80px;
+    background: var(--pipe);
+    border: 4px solid var(--pipe-dark);
+    border-radius: 4px;
+    box-shadow: inset -8px 0 0 rgba(0,0,0,0.15);
+  }
+  .pipe::after {
+    content: '';
+    position: absolute;
+    left: -12px; right: -12px;
+    height: 32px;
+    background: var(--pipe);
+    border: 4px solid var(--pipe-dark);
+    border-radius: 4px;
+    box-shadow: inset -8px 0 0 rgba(0,0,0,0.15);
+  }
+  .pipe-left-top    { left: 6%;  top: 0;    height: 180px; }
+  .pipe-left-top::after    { bottom: -4px; }
+  .pipe-left-bottom { left: 6%;  bottom: 20%; height: 240px; }
+  .pipe-left-bottom::after { top: -4px; }
+  .pipe-right-top    { right: 6%; top: 0;    height: 240px; }
+  .pipe-right-top::after   { bottom: -4px; }
+  .pipe-right-bottom { right: 6%; bottom: 20%; height: 180px; }
+  .pipe-right-bottom::after { top: -4px; }
+
+  /* Animated bird */
+  .hero-bird {
+    position: absolute;
+    left: 50%;
+    top: 32%;
+    font-size: 72px;
+    transform: translateX(-50%);
+    animation: bob 1.6s ease-in-out infinite;
+    filter: drop-shadow(4px 6px 0 rgba(0,0,0,0.25));
+    z-index: 2;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateX(-50%) translateY(0) rotate(-8deg); }
+    50%      { transform: translateX(-50%) translateY(-20px) rotate(8deg); }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    max-width: 720px;
+  }
+  .hero h1 {
+    font-size: clamp(48px, 9vw, 96px);
+    font-weight: 900;
+    color: var(--white);
+    text-shadow:
+      4px 4px 0 var(--ink),
+      -2px -2px 0 var(--ink),
+      2px -2px 0 var(--ink),
+      -2px 2px 0 var(--ink);
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+  .hero p.tagline {
+    font-size: clamp(18px, 2.5vw, 26px);
+    color: var(--white);
+    font-weight: 600;
+    text-shadow: 2px 2px 0 var(--ink-soft);
+    margin-bottom: 36px;
+  }
+  .cta-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    padding: 18px 36px;
+    font-size: 18px;
+    font-weight: 800;
+    text-decoration: none;
+    border-radius: 12px;
+    border: 4px solid var(--ink);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 6px 0 var(--ink);
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 0 var(--ink); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--ink); }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--ink);
+  }
+  .btn-secondary {
+    background: var(--white);
+    color: var(--ink);
+  }
+
+  /* Ground texture strip */
+  .ground-strip {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 20%;
+    background:
+      repeating-linear-gradient(
+        -45deg,
+        var(--ground) 0, var(--ground) 12px,
+        var(--ground-dark) 12px, var(--ground-dark) 24px
+      );
+    border-top: 6px solid var(--pipe-dark);
+  }
+
+  /* ---------- FEATURES ---------- */
+  .features {
+    padding: 100px 24px;
+    background: var(--white);
+  }
+  .section-title {
+    text-align: center;
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 900;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+  .section-subtitle {
+    text-align: center;
+    font-size: 18px;
+    color: var(--ink-soft);
+    margin-bottom: 60px;
+  }
+  .feature-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 32px;
+  }
+  .feature-card {
+    padding: 36px 28px;
+    background: linear-gradient(180deg, #f7fbfc 0%, #e8f5f7 100%);
+    border: 4px solid var(--ink);
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 8px 0 var(--ink);
+    transition: transform 0.2s;
+  }
+  .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 0 var(--ink); }
+  .feature-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .feature-card h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+    font-weight: 800;
+  }
+  .feature-card p {
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+
+  /* ---------- SCREENSHOTS ---------- */
+  .screens {
+    padding: 100px 24px;
+    background: linear-gradient(180deg, #f0fafb 0%, #e0f2f4 100%);
+  }
+  .phone-row {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .phone {
+    width: 240px;
+    height: 480px;
+    background: var(--ink);
+    border-radius: 32px;
+    padding: 12px;
+    box-shadow: var(--shadow);
+    flex-shrink: 0;
+  }
+  .phone-screen {
+    width: 100%;
+    height: 100%;
+    border-radius: 22px;
+    overflow: hidden;
+    position: relative;
+    background: var(--sky);
+  }
+  .phone-screen .mini-ground {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 20%;
+    background: repeating-linear-gradient(-45deg, var(--ground) 0 6px, var(--ground-dark) 6px 12px);
+    border-top: 3px solid var(--pipe-dark);
+  }
+  .phone-screen .mini-pipe {
+    position: absolute;
+    width: 36px;
+    background: var(--pipe);
+    border: 2px solid var(--pipe-dark);
+  }
+  .phone-screen .mini-bird {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    transform: translate(-50%, -50%);
+    font-size: 28px;
+    filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.3));
+  }
+  .phone-screen .mini-score {
+    position: absolute;
+    top: 20px; left: 0; right: 0;
+    text-align: center;
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--white);
+    text-shadow: 2px 2px 0 var(--ink);
+  }
+  .phone-screen .mini-title {
+    position: absolute;
+    top: 30%; left: 0; right: 0;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--white);
+    text-shadow: 2px 2px 0 var(--ink);
+  }
+  .phone-screen .mini-sub {
+    position: absolute;
+    top: 40%; left: 0; right: 0;
+    text-align: center;
+    font-size: 12px;
+    color: var(--white);
+    text-shadow: 1px 1px 0 var(--ink);
+  }
+  .phone-screen .mini-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+  }
+  .phone-screen .go-title {
+    position: absolute;
+    top: 28%; left: 0; right: 0;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 900;
+    color: #FF4444;
+    text-shadow: 2px 2px 0 var(--ink);
+  }
+  .phone-screen .go-score {
+    position: absolute;
+    top: 42%; left: 0; right: 0;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--white);
+  }
+  .phone-screen .go-best {
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--gold);
+  }
+
+  /* ---------- CTA BAND ---------- */
+  .cta-band {
+    padding: 80px 24px;
+    background: var(--sky);
+    text-align: center;
+    border-top: 8px solid var(--pipe-dark);
+    border-bottom: 8px solid var(--pipe-dark);
+  }
+  .cta-band h2 {
+    color: var(--white);
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 900;
+    text-shadow: 3px 3px 0 var(--ink);
+    margin-bottom: 24px;
+  }
+  .cta-band p {
+    color: var(--white);
+    font-size: 18px;
+    font-weight: 600;
+    text-shadow: 1px 1px 0 var(--ink-soft);
+    margin-bottom: 32px;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer {
+    background: var(--ink);
+    color: var(--white);
+    padding: 40px 24px;
+    text-align: center;
+  }
+  footer p { opacity: 0.8; font-size: 14px; }
+  footer .footer-bird { font-size: 24px; margin-bottom: 8px; display: block; }
+
+  @media (max-width: 600px) {
+    nav { padding: 12px 20px; }
+    nav ul { gap: 16px; }
+    nav a { font-size: 14px; }
+    .pipe { width: 50px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><span class="logo-bird">🐦</span>Flappy Bird</div>
+  <ul>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#screens">Screens</a></li>
+    <li><a href="#play">Play</a></li>
+  </ul>
+</nav>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+
+  <div class="pipe pipe-left-top"></div>
+  <div class="pipe pipe-left-bottom"></div>
+  <div class="pipe pipe-right-top"></div>
+  <div class="pipe pipe-right-bottom"></div>
+
+  <div class="hero-bird">🐦</div>
+
+  <div class="hero-content">
+    <h1>FLAPPY BIRD</h1>
+    <p class="tagline">Tap. Flap. Survive. One pipe at a time.</p>
+    <div class="cta-row">
+      <a href="#play" class="btn btn-primary">▶ Play Now</a>
+      <a href="#features" class="btn btn-secondary">Learn More</a>
+    </div>
+  </div>
+
+  <div class="ground-strip"></div>
+</section>
+
+<!-- ================= FEATURES ================= -->
+<section class="features" id="features">
+  <h2 class="section-title">Why You'll Love It</h2>
+  <p class="section-subtitle">Simple to learn. Impossible to put down.</p>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <span class="feature-icon">👆</span>
+      <h3>One-Tap Control</h3>
+      <p>Tap anywhere to flap. That's the entire tutorial.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🏆</span>
+      <h3>Best Score Tracking</h3>
+      <p>Your personal best stays on screen, taunting you forever.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">⚡</span>
+      <h3>60 FPS Smooth</h3>
+      <p>Buttery React Native performance on iOS and Android.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📱</span>
+      <h3>Runs Everywhere</h3>
+      <p>iOS, Android, and the web — all from one Expo codebase.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCREENSHOTS ================= -->
+<section class="screens" id="screens">
+  <h2 class="section-title">See It In Action</h2>
+  <p class="section-subtitle">Three screens. Infinite frustration.</p>
+
+  <div class="phone-row">
+    <!-- Start screen -->
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="mini-bird">🐦</div>
+        <div class="mini-ground"></div>
+        <div class="mini-overlay"></div>
+        <div class="mini-title">FLAPPY BIRD</div>
+        <div class="mini-sub">Tap to play</div>
+      </div>
+    </div>
+
+    <!-- Playing screen -->
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="mini-score">7</div>
+        <div class="mini-pipe" style="left: 20px; top: 0; height: 140px;"></div>
+        <div class="mini-pipe" style="left: 20px; top: 240px; bottom: 20%; height: 120px;"></div>
+        <div class="mini-pipe" style="right: -20px; top: 0; height: 80px;"></div>
+        <div class="mini-pipe" style="right: -20px; top: 180px; height: 200px;"></div>
+        <div class="mini-bird" style="top: 48%;">🐦</div>
+        <div class="mini-ground"></div>
+      </div>
+    </div>
+
+    <!-- Game over screen -->
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="mini-bird" style="top: 35%;">🐦</div>
+        <div class="mini-ground"></div>
+        <div class="mini-overlay"></div>
+        <div class="go-title">GAME OVER</div>
+        <div class="go-score">Score: 12</div>
+        <div class="go-best">Best: 27</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA BAND ================= -->
+<section class="cta-band" id="play">
+  <h2>Ready to flap?</h2>
+  <p>Free. No ads. Just you, a bird, and a wall of pipes.</p>
+  <div class="cta-row">
+    <a href="#" class="btn btn-primary">📱 Download for iOS</a>
+    <a href="#" class="btn btn-secondary">🤖 Get it on Android</a>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <span class="footer-bird">🐦</span>
+  <p>Built with React Native + Expo · © 2026 Flappy Bird</p>
+</footer>
+
+</body>
+</html>
