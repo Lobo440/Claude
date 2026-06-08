@@ -17,7 +17,6 @@ keychains crafted from a customer's pet photo**. Built with **React + Vite**.
 ## Getting started
 
 ```bash
-cd website
 npm install
 npm run dev      # start the dev server (http://localhost:5173)
 npm run build    # production build into dist/
@@ -27,7 +26,7 @@ npm run preview  # preview the production build
 ## Project structure
 
 ```
-website/
+.
 ├── index.html
 ├── vite.config.js
 ├── package.json
