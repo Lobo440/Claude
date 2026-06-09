@@ -16,26 +16,28 @@ const steps = [
   },
 ];
 
+import Reveal from './Reveal.jsx';
+
 export default function HowItWorks() {
   return (
     <section className="section how" id="how">
       <div className="container">
-        <div className="section__head">
+        <Reveal className="section__head">
           <span className="eyebrow">Simple process</span>
           <h2 className="section__title">From photo to pocket in 3 steps</h2>
           <p className="section__lead">
             No design skills needed. You send the photo, we handle the magic.
           </p>
-        </div>
+        </Reveal>
 
         <ol className="how__steps">
           {steps.map((step, i) => (
-            <li className="how__step card" key={step.title}>
+            <Reveal as="li" className="how__step card" key={step.title} delay={i * 120}>
               <span className="how__num">{i + 1}</span>
               <span className="how__icon" aria-hidden="true">{step.icon}</span>
               <h3>{step.title}</h3>
               <p>{step.text}</p>
-            </li>
+            </Reveal>
           ))}
         </ol>
       </div>

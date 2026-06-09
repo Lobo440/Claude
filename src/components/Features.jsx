@@ -1,3 +1,5 @@
+import Reveal from './Reveal.jsx';
+
 const features = [
   {
     icon: '✨',
@@ -35,18 +37,18 @@ export default function Features() {
   return (
     <section className="section features">
       <div className="container">
-        <div className="section__head">
+        <Reveal className="section__head">
           <span className="eyebrow">Why PawTag 3D</span>
           <h2 className="section__title">Crafted with care, made to be carried</h2>
-        </div>
+        </Reveal>
 
         <div className="features__grid">
-          {features.map((f) => (
-            <article className="feature card" key={f.title}>
+          {features.map((f, i) => (
+            <Reveal as="article" className="feature card" key={f.title} delay={(i % 3) * 110}>
               <span className="feature__icon" aria-hidden="true">{f.icon}</span>
               <h3>{f.title}</h3>
               <p>{f.text}</p>
-            </article>
+            </Reveal>
           ))}
         </div>
       </div>

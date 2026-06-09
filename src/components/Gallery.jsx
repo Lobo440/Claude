@@ -9,21 +9,23 @@ const samples = [
   { pet: '🐹', name: 'Biscuit', breed: 'Hamster' },
 ];
 
+import Reveal from './Reveal.jsx';
+
 export default function Gallery() {
   return (
     <section className="section gallery" id="gallery">
       <div className="container">
-        <div className="section__head">
+        <Reveal className="section__head">
           <span className="eyebrow">Real keychains</span>
           <h2 className="section__title">A little fan club of finished pieces</h2>
           <p className="section__lead">
             Every keychain is one of a kind — just like its owner.
           </p>
-        </div>
+        </Reveal>
 
         <div className="gallery__grid">
-          {samples.map((s) => (
-            <figure className="gallery__item" key={s.name}>
+          {samples.map((s, i) => (
+            <Reveal as="figure" className="gallery__item" key={s.name} delay={(i % 4) * 90}>
               <div className="gallery__charm">
                 <span aria-hidden="true">{s.pet}</span>
               </div>
@@ -31,7 +33,7 @@ export default function Gallery() {
                 <strong>{s.name}</strong>
                 <span>{s.breed}</span>
               </figcaption>
-            </figure>
+            </Reveal>
           ))}
         </div>
       </div>

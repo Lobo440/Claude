@@ -1,3 +1,5 @@
+import Reveal from './Reveal.jsx';
+
 const plans = [
   {
     name: 'Single Pup',
@@ -41,19 +43,21 @@ export default function Pricing() {
   return (
     <section className="section pricing" id="pricing">
       <div className="container">
-        <div className="section__head">
+        <Reveal className="section__head">
           <span className="eyebrow">Pricing</span>
           <h2 className="section__title">Pick your pack</h2>
           <p className="section__lead">
             Simple pricing, free shipping on every order. No hidden fees.
           </p>
-        </div>
+        </Reveal>
 
         <div className="pricing__grid">
-          {plans.map((plan) => (
-            <article
+          {plans.map((plan, i) => (
+            <Reveal
+              as="article"
               className={`plan card ${plan.featured ? 'plan--featured' : ''}`}
               key={plan.name}
+              delay={i * 120}
             >
               {plan.featured && <span className="plan__badge">Best value</span>}
               <h3 className="plan__name">{plan.name}</h3>
@@ -73,7 +77,7 @@ export default function Pricing() {
               >
                 {plan.cta}
               </a>
-            </article>
+            </Reveal>
           ))}
         </div>
       </div>
