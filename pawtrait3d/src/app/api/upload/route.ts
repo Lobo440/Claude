@@ -1,15 +1,21 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
 import { randomUUID } from "node:crypto";
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
 const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/heic"];
 
 /**
- * Receives the customer's pet photo, stores it under /uploads with a unique
- * reference, and returns that reference so it can be attached to the order's
- * Stripe metadata. Each paid order therefore links back to its photo.
+ * Receives the customer's pet photo and returns a unique reference that gets
+ * attached to the order's Stripe metadata, so each paid order links back to
+ * its photo.
+ *
+ * Storage is best-effort: locally it writes to ./uploads; on a read-only
+ * serverless host (e.g. Vercel) it falls back to the OS temp dir. If neither
+ * is writable, it still returns a reference so the order flow is never blocked
+ * — wire this route to durable storage (Vercel Blob, S3) for production.
  */
 export async function POST(request: NextRequest) {
   const form = await request.formData();
@@ -30,16 +36,25 @@ export async function POST(request: NextRequest) {
 
   const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
   const ref = `${Date.now()}-${randomUUID().slice(0, 8)}`;
-  const dir = join(process.cwd(), "uploads");
 
-  try {
-    await mkdir(dir, { recursive: true });
-    const bytes = Buffer.from(await file.arrayBuffer());
-    await writeFile(join(dir, `${ref}.${ext}`), bytes);
-  } catch (err) {
-    console.error("Upload error:", err);
-    return NextResponse.json({ error: "Could not save photo." }, { status: 500 });
+  // Try the project's uploads/ dir, then the OS temp dir as a serverless fallback.
+  const bytes = Buffer.from(await file.arrayBuffer());
+  let stored = false;
+  for (const dir of [join(process.cwd(), "uploads"), join(tmpdir(), "pawtrait-uploads")]) {
+    try {
+      await mkdir(dir, { recursive: true });
+      await writeFile(join(dir, `${ref}.${ext}`), bytes);
+      stored = true;
+      break;
+    } catch {
+      // try the next location
+    }
   }
 
-  return NextResponse.json({ ref });
+  if (!stored) {
+    console.warn(`Photo ${ref} could not be persisted on this host; returning ref anyway.`);
+  }
+
+  return NextResponse.json({ ref, stored });
 }
+
