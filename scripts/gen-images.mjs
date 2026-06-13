@@ -3,9 +3,11 @@
  * Generate marketing imagery with the Higgsfield AI CLI.
  *
  * Setup (one time):
- *   1. npm install            # installs @higgsfield/cli locally
- *   2. npx higgsfield auth login
- *   3. npm run gen-images
+ *   1. npx -y --package=@higgsfield/cli higgsfield auth login
+ *   2. npm run gen-images
+ *
+ * The CLI is fetched on demand by npx — it is deliberately not a project
+ * dependency, so it never runs during a Vercel/production build.
  *
  * Generated files land in /public so you can drop them straight into the site.
  * Until you run this, the site uses its built-in SVG art and looks complete.
@@ -48,9 +50,13 @@ console.log(`Generating ${shots.length} images with Higgsfield (${MODEL})…\n`)
 
 for (const shot of shots) {
   console.log(`→ ${shot.name}`);
+  // The Higgsfield CLI is fetched on demand via npx (it is intentionally NOT a
+  // project dependency, so it never runs during a deploy build).
   const res = spawnSync(
     "npx",
     [
+      "-y",
+      "--package=@higgsfield/cli",
       "higgsfield",
       "generate",
       "create",
@@ -64,7 +70,7 @@ for (const shot of shots) {
   );
   if (res.status !== 0) {
     console.error(
-      `\n⚠  Could not generate "${shot.name}". Make sure you ran "npx higgsfield auth login" and set HIGGSFIELD_API_KEY.\n`,
+      `\n⚠  Could not generate "${shot.name}". First run:\n     npx -y --package=@higgsfield/cli higgsfield auth login\n   and set HIGGSFIELD_API_KEY.\n`,
     );
   }
 }
