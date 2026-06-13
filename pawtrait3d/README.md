@@ -13,17 +13,18 @@ Stripe Checkout.
 
 ## 1. Run it on your computer
 
-From the root of this repository:
+The website lives in the `pawtrait3d/` folder of this repository:
 
 ```bash
+cd pawtrait3d
 npm install
 npm run dev
 ```
 
 Open <http://localhost:3000>. That's the whole site.
 
-> The unrelated Flappy Bird demo from an earlier project lives in `flappy-bird/`
-> and is not part of the website.
+> An unrelated Flappy Bird demo from an earlier project lives in the repo's
+> `flappy-bird/` folder and is not part of the website.
 
 ---
 
@@ -51,7 +52,7 @@ To change the prototype showcase image, replace **`public/prototype.png`**.
 2. Go to <https://dashboard.stripe.com/apikeys> and copy your **Publishable** and
    **Secret** keys. Start with the **test** keys (`pk_test_…` / `sk_test_…`) so you can
    try everything without real charges.
-3. In the project root, copy `.env.example` to `.env.local`:
+3. In the `pawtrait3d` folder, copy `.env.example` to `.env.local`:
    ```bash
    cp .env.example .env.local
    ```
@@ -74,9 +75,9 @@ uploaded photo for that reference is saved in the `uploads/` folder on the serve
 ## 4. Put it online (free) with Vercel
 
 1. Push this project to GitHub (already done in this repo).
-2. Go to <https://vercel.com>, sign in with GitHub, and **Import** the repo. The Next.js
-   app is at the repository root, so you can leave the Root Directory as the default —
-   Vercel detects Next.js automatically.
+2. Go to <https://vercel.com>, sign in with GitHub, and **Import** the repo. Set the
+   project's **Root Directory** to **`pawtrait3d`** (the website lives in that folder);
+   Vercel then detects Next.js automatically.
 3. In Vercel **Settings → Environment Variables**, add the same three values from your
    `.env.local`, plus `NEXT_PUBLIC_SITE_URL` set to your Vercel URL (e.g.
    `https://your-project.vercel.app`).
@@ -126,7 +127,7 @@ This site sells the product — here's the rough production loop on your printer
 ## Project structure
 
 ```
-. (repository root = the website)
+pawtrait3d/                      ← the website (set this as the Vercel Root Directory)
 ├── src/
 │   ├── config/business.ts      ← edit your business info & prices here
 │   ├── components/             ← Navbar, Footer, 3D keychain art, animations
@@ -140,8 +141,10 @@ This site sells the product — here's the rough production loop on your printer
 │           ├── checkout/       ← creates Stripe Checkout sessions
 │           └── upload/         ← receives pet photos
 ├── scripts/gen-images.mjs      ← optional Higgsfield image generator
-├── .env.example                ← copy to .env.local and add your keys
-└── flappy-bird/                ← unrelated demo from an earlier project
+├── vercel.json                 ← pins the Next.js build settings
+└── .env.example                ← copy to .env.local and add your keys
+
+flappy-bird/                     ← unrelated demo from an earlier project
 ```
 
 Happy printing! 🐾
