@@ -97,12 +97,13 @@ The site ships with clean built-in artwork, but you can generate photorealistic 
 shots with [Higgsfield AI](https://higgsfield.ai):
 
 ```bash
-npx higgsfield auth login        # sign in once
-npm run gen-images               # creates images in public/generated/
+npx -y --package=@higgsfield/cli higgsfield auth login   # sign in once
+npm run gen-images                                        # creates images in public/generated/
 ```
 
-Edit the prompts in `scripts/gen-images.mjs` to taste, then reference the generated
-files (e.g. `/generated/hero.png`) in your pages.
+The CLI is fetched on demand by `npx`, so it is **not** a project dependency and never
+runs during a deploy build. Edit the prompts in `scripts/gen-images.mjs` to taste, then
+reference the generated files (e.g. `/generated/hero.png`) in your pages.
 
 ---
 
